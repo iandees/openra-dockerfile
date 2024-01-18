@@ -1,11 +1,4 @@
-ARG BASE_IMAGE_PREFIX
-FROM ${BASE_IMAGE_PREFIX}mono
-
-# see hooks/post_checkout
-ARG ARCH
-
-# HACK: don't fail when no qemu binary provided
-COPY .gitignore qemu-${ARCH}-static* /usr/bin/
+FROM mono
 
 ARG OPENRA_RELEASE_VERSION=20230225
 ARG OPENRA_RELEASE
@@ -76,8 +69,8 @@ CMD [ "/home/openra/lib/openra/launch-dedicated.sh" ]
 # https://github.com/opencontainers/image-spec/blob/v1.0.1/annotations.md#pre-defined-annotation-keys
 LABEL org.opencontainers.image.title="OpenRA dedicated server"
 LABEL org.opencontainers.image.description="Image to run a server instance for OpenRA"
-LABEL org.opencontainers.image.url="https://github.com/rmoriz/openra-dockerfile"
-LABEL org.opencontainers.image.documentation="https://github.com/rmoriz/openra-dockerfile#readme"
+LABEL org.opencontainers.image.url="https://github.com/iandees/openra-dockerfile"
+LABEL org.opencontainers.image.documentation="https://github.com/iandees/openra-dockerfile#readme"
 LABEL org.opencontainers.image.version=${OPENRA_RELEASE_TYPE}-${OPENRA_RELEASE_VERSION}
 LABEL org.opencontainers.image.licenses="GPL-3.0"
-LABEL org.opencontainers.image.authors="Roland Moriz"
+LABEL org.opencontainers.image.authors="Ian Dees,Roland Moriz"

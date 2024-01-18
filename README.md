@@ -1,10 +1,5 @@
 # Dockerfile for an OpenRA dedicated server
 
-### News 02/2019
-
-  - image is now based on the official mono base image which is based on Debian
-  - image is available for amd64, arm32v5 and aarch64
-
 ### Build FAQ
 
   - Images are built on Docker Hub for various architectures (see `hooks/.config`)
