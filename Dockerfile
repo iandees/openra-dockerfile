@@ -73,4 +73,4 @@ LABEL org.opencontainers.image.url="https://github.com/iandees/openra-dockerfile
 LABEL org.opencontainers.image.documentation="https://github.com/iandees/openra-dockerfile#readme"
 LABEL org.opencontainers.image.version=${OPENRA_RELEASE_TYPE}-${OPENRA_RELEASE_VERSION}
 LABEL org.opencontainers.image.licenses="GPL-3.0"
-LABEL org.opencontainers.image.authors="Ian Dees,Roland Moriz"
+LABEL org.opencontainers.image.authors="Ian Dees"

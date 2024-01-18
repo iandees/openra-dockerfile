@@ -1,4 +1,5 @@
 Copyright (c) 2019 Roland Moriz https://roland.io/
+Copyright (c) 2024 Ian Dees https://github.com/iandees/
 
 MIT License
 
