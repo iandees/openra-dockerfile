@@ -8,6 +8,7 @@ on:
     # And to tagged releases
     tags:
       - 'release-*'
+      - 'playtest-*'
   # Build on demand from the GitHub Actions UI
   workflow_dispatch:
 

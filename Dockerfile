@@ -1,13 +1,11 @@
-FROM mono
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 ARG OPENRA_RELEASE_VERSION=20260222
-ARG OPENRA_RELEASE
 ARG OPENRA_RELEASE_TYPE=playtest
 
-# https://www.openra.net/download/
-ENV OPENRA_RELEASE_VERSION=${OPENRA_RELEASE_VERSION:-20250303}
-ENV OPENRA_RELEASE_TYPE=${OPENRA_RELEASE_TYPE:-release}
-ENV OPENRA_RELEASE=${OPENRA_RELEASE:-https://github.com/OpenRA/OpenRA/releases/download/${OPENRA_RELEASE_TYPE}-${OPENRA_RELEASE_VERSION}/OpenRA-${OPENRA_RELEASE_TYPE}-${OPENRA_RELEASE_VERSION}-source.tar.bz2}
+ENV OPENRA_RELEASE_VERSION=${OPENRA_RELEASE_VERSION}
+ENV OPENRA_RELEASE_TYPE=${OPENRA_RELEASE_TYPE}
+ENV OPENRA_RELEASE=https://github.com/OpenRA/OpenRA/releases/download/${OPENRA_RELEASE_TYPE}-${OPENRA_RELEASE_VERSION}/OpenRA-${OPENRA_RELEASE_TYPE}-${OPENRA_RELEASE_VERSION}-source.tar.bz2
 
 RUN set -xe; \
         echo "=================================================================="; \
@@ -18,38 +16,45 @@ RUN set -xe; \
         echo "=================================================================="; \
         \
         apt-get update; \
-        apt-get -y upgrade; \
         apt-get install -y --no-install-recommends \
+                    bzip2 \
                     ca-certificates \
                     curl \
-                    liblua5.1 \
-                    libsdl2-2.0-0 \
-                    libopenal1 \
+                    libfreetype-dev \
+                    liblua5.1-0-dev \
+                    libopenal-dev \
+                    libsdl2-dev \
                     make \
-                    patch \
-                    unzip \
+                  ; \
+        mkdir /build; \
+        cd /build; \
+        curl -L $OPENRA_RELEASE | tar xj; \
+        make all TARGETPLATFORM=unix-generic
+
+FROM mcr.microsoft.com/dotnet/runtime:8.0
+
+ARG OPENRA_RELEASE_VERSION=20260222
+ARG OPENRA_RELEASE_TYPE=playtest
+
+RUN set -xe; \
+        apt-get update; \
+        apt-get install -y --no-install-recommends \
+                    libfreetype6 \
+                    liblua5.1-0 \
+                    libopenal1 \
+                    libsdl2-2.0-0 \
                     xdg-utils \
                     zenity \
-                    wget \
                   ; \
-        useradd -d /home/openra -m -s /sbin/nologin openra; \
-        mkdir /home/openra/source; \
-        cd /home/openra/source; \
-        curl -L $OPENRA_RELEASE | tar xj; \
-        make all RUNTIME=mono; \
-        # Hack
-        # "make install" seems not to work anymore, needs debugging
-        mkdir -p /home/openra/lib/openra; \
-        mv /home/openra/source/* /home/openra/lib/openra; \
-        # /Hack
-        mkdir /home/openra/.openra \
-              /home/openra/.openra/Logs \
-              /home/openra/.openra/maps \
-            ;\
-        chown -R openra:openra /home/openra/.openra; \
-        apt-get purge -y curl make patch unzip; \
         rm -rf /var/lib/apt/lists/* \
-               /var/cache/apt/archives/*
+               /var/cache/apt/archives/*; \
+        useradd -d /home/openra -m -s /sbin/nologin openra; \
+        mkdir -p /home/openra/.openra \
+                 /home/openra/.openra/Logs \
+                 /home/openra/.openra/maps; \
+        chown -R openra:openra /home/openra/.openra
+
+COPY --from=build /build /home/openra/lib/openra
 
 EXPOSE 1234
 
@@ -57,11 +62,6 @@ USER openra
 
 WORKDIR /home/openra/lib/openra
 VOLUME ["/home/openra/.openra"]
-
-# https://github.com/OpenRA/OpenRA/blob/release-20200202/launch-dedicated.sh
-# NOTE: With 2020202 geoip mapping and player IPs are not resolved/disclosed
-#       anymore due to upstream and privacy reasons.
-#       see options "Server.ShareAnonymizedIPs" and "Server.GeoIPDatabase"
 
 CMD [ "/home/openra/lib/openra/launch-dedicated.sh" ]
 
