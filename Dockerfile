@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 ARG OPENRA_RELEASE_VERSION=20261026
 ARG OPENRA_RELEASE_TYPE=playtest
@@ -31,7 +31,7 @@ RUN set -xe; \
         curl -L $OPENRA_RELEASE | tar xj; \
         make all TARGETPLATFORM=unix-generic
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0
+FROM mcr.microsoft.com/dotnet/runtime:10.0
 
 ARG OPENRA_RELEASE_VERSION=20261026
 ARG OPENRA_RELEASE_TYPE=playtest
